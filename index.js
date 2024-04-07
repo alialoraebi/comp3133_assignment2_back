@@ -211,43 +211,38 @@ const root = {
 
 
 const startServer = async () => {
-    const port = process.env.PORT || 4000;     
-    const server = new ApolloServer({ 
-      typeDefs: schema, 
-      resolvers: root,
-      cors: {
-        origin: '*', 
-        credentials: true
-      }
+    const port = process.env.PORT || 4000;
+    const server = new ApolloServer({
+        typeDefs: schema,
+        resolvers: root,
+        cors: {
+            origin: '*', 
+            credentials: true
+        }
     });
-  
+
     const app = express();
-  
+
     await server.start();
     server.applyMiddleware({ app });
-  
-    if (process.env.NODE_ENV !== 'production') {
-      app.listen(4000, () => console.log(`Server ready at http://localhost:4000${server.graphqlPath}`));
-    }
 
-    // if (process.env.NODE_ENV !== 'production') {
-    //     app.listen(port, '0.0.0.0', () => {
-    //       console.log(`Server is running on http://0.0.0.0:${port}${server.graphqlPath}`);
-    //     });
-    //   }
-  
+    // Listen on the specified port in all environments
+    app.listen(port, () => {
+        console.log(`Server ready at http://localhost:${port}${server.graphqlPath}`);
+    });
+
     module.exports.handler = (req, res) => {
-      res.setHeader('Access-Control-Allow-Origin', '*'); 
-      res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-      if (req.method === 'OPTIONS') {
-        res.end();
-        return;
-      }
-  
-      return serverless(app)(req, res);
+        res.setHeader('Access-Control-Allow-Origin', '*'); 
+        res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+        if (req.method === 'OPTIONS') {
+            res.end();
+            return;
+        }
+
+        return serverless(app)(req, res);
     };
-  };
-  
-  startServer();
+};
+
+startServer();
